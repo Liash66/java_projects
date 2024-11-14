@@ -48,21 +48,6 @@ public class Main {
                 col1 = Integer.parseInt(coords[3]);
             }
 
-            char kingColor;
-            if (board.getColorGame() == 'w') {
-                kingColor = 'b';
-            } else {
-                kingColor = 'w';
-            }
-            if (board.isKingInCheck(kingColor)) {
-                System.out.println("Шах");
-            }
-
-            if (board.isCheckmate(kingColor)) {
-                System.out.println("Мат");
-                isGame = false;
-            }
-
             switch (board.getColorGame()){
                 case 'w': board.setColorGame('b');break;
                 case 'b': board.setColorGame('w');break;

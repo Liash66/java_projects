@@ -7,22 +7,25 @@ import Figures.Queen;
 import Figures.Rook;
 
 public class Board {
+
     private char colorGame;
 
     public void setColorGame(char colorGame) {
         this.colorGame = colorGame;
     }
 
-    public char getColorGame() {
+    public  char getColorGame(){
         return colorGame;
     }
 
+
     private Figure fields[][] = new Figure[8][8];
 
-    public void init() {
+
+    public void init(){
         this.fields[1] = new Figure[]{
-            new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),
-            new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),
+                new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),
+                new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),new Pawn("P", 'w'),
         };
         this.fields[6] = new Figure[] {
                 new Pawn("P", 'b'),new Pawn("P", 'b'),new Pawn("P", 'b'),new Pawn("P", 'b'),
@@ -36,137 +39,104 @@ public class Board {
         };
     }
 
-    public String getCell(int row, int col) {
-        Figure figure = fields[row][col];
-        if (figure == null) {
+    public String getCell(int row, int col){
+        Figure figure = this.fields[row][col];
+        if (figure ==null){
             return "    ";
         }
-        return " " + figure.getColor() + figure.getName() + " ";
+        return  " "+figure.getColor()+figure.getName()+" ";
     }
-
-    public void print_board() {
+    public void print_board(){
         System.out.println(" +----+----+----+----+----+----+----+----+");
-        for (int row = 7; row >= 0; row--) {
+        for (int row = 7; row > -1 ; row --){
             System.out.print(row);
-            for (int col = 0; col < 8; col++) {
-                System.out.print("|" + getCell(row, col));
+            for (int col=0; col<8; col++){
+                System.out.print("|"+getCell(row, col));
             }
             System.out.println("|");
             System.out.println(" +----+----+----+----+----+----+----+----+");
         }
-        System.out.println("    0    1    2    3    4    5    6    7 ");
+
+        for(int col=0; col< 8; col++){
+            System.out.print("    "+col);
+        }
     }
 
-    private boolean check_move(int row, int col, int row1, int col1) {
-        if (fields[row][col] instanceof Knight) {
-            return true;
-        }
-
-        int rowDir = 0;
-        int colDir = 0;
-    
-        if (row1 > row) {
-            rowDir = 1;
-        } else if (row1 < row) {
-            rowDir = -1;
-        }
-    
-        if (col1 > col) {
-            colDir = 1;
-        } else if (col1 < col) {
-            colDir = -1;
-        }
-    
-        int tempRow = row + rowDir;
-        int tempCol = col + colDir;
-    
-        while (tempRow != row1 || tempCol != col1) {
-            if (fields[tempRow][tempCol] != null) {
-                return false;
-            }
-            tempRow += rowDir;
-            tempCol += colDir;
-        }
-        return true;
-    }
-
-    public boolean move_figure(int row, int col, int row1, int col1) {
-        Figure figure = fields[row][col];
-
-        if (figure.canMove(row, col, row1, col1) && check_move(row, col, row1, col1)) {
-            Figure target = fields[row1][col1];
-            if (target != null && target.getColor() == colorGame) {
-                return false;
-            }
-
-            fields[row1][col1] = figure;
-            fields[row][col] = null;
-
-            if (isCheckmate(colorGame)) {
-                fields[row][col] = figure;
-                fields[row1][col1] = target;
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isKingInCheck(char kingColor) {
-        int kingRow = -1;
-        int kingCol = -1;
-    
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (fields[row][col] instanceof King && fields[row][col].getColor() == kingColor) {
-                    kingRow = row;
-                    kingCol = col;
-                    break;
+    public boolean check_move(Figure figure, int row, int col, int row1, int col1){
+        switch (figure.getName()){
+            case "P":
+                if ((row+2==row1 || row-2==row1) &&
+                (figure.getColor() == 'b' && this.fields[row - 1][col] != null ||
+                        figure.getColor() == 'w' && this.fields[row + 1][col] != null)) {
+                    return false;
                 }
-            }
-            if (kingRow != -1) break;
-        }
-    
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (fields[row][col] != null && fields[row][col].getColor() != kingColor) {
-                    if (fields[row][col].canMove(row, col, kingRow, kingCol) && check_move(row, col, kingRow, kingCol)) {
-                        return true;
+            case "R":
+                if (row == row1){
+                    for (int i = Math.min(col, col1); i < Math.max(col, col1); i++){
+                        if (this.fields[row][i] != null){
+                            return false;
+                        }
                     }
-                }
-            }
-        }
-        return false;
-    }
-    
-    public boolean isCheckmate(char kingColor) {
-        if (!isKingInCheck(kingColor)) return false;
-    
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Figure figure = fields[row][col];
-                if (figure != null && figure.getColor() == kingColor) {
-                    for (int tempRow = 0; tempRow < 8; tempRow++) {
-                        for (int tempCol = 0; tempCol < 8; tempCol++) {
-                            Figure target = fields[tempRow][tempCol];
-                            if (target != null && target.getColor() == kingColor) continue;
-    
-                            if (figure.canMove(row, col, tempRow, tempCol) && check_move(row, col, tempRow, tempCol)) {
-                                fields[tempRow][tempCol] = figure;
-                                fields[row][col] = null;
-    
-                                boolean stillInCheck = isKingInCheck(kingColor);
-    
-                                fields[row][col] = figure;
-                                fields[tempRow][tempCol] = target;
-    
-                                if (!stillInCheck) return false;
-                            }
+                } else if (col == col1){
+                    for (int i = Math.min(row, row1); i < Math.max(row, row1); i++){
+                        if (this.fields[i][col] != null){
+                            return false;
                         }
                     }
                 }
-            }
+            case "B":
+                for (int i = 1; i < Math.abs(row - row1); i++){
+                    if (row > row1 && col > col1 && this.fields[row-i][col-i] != null){
+                        return false;
+                    } else if (row > row1 && col < col1 && this.fields[row-i][col+i] != null){
+                        return false;
+                    } else if (row < row1 && col > col1 && this.fields[row+i][col-i] != null){
+                        return false;
+                    } else if (row < row1 && col < col1 && this.fields[row+i][col+i] != null){
+                        return false;
+                    }
+                }
+            case "Q":
+                if (row == row1){
+                    for (int i = Math.min(col, col1); i < Math.max(col, col1); i++){
+                        if (this.fields[row][i] != null){
+                            return false;
+                        }
+                    }
+                } else if (col == col1){
+                    for (int i = Math.min(row, row1); i < Math.max(row, row1); i++){
+                        if (this.fields[i][col] != null){
+                            return false;
+                        }
+                    }
+                } else {
+                    for (int i = 1; i < Math.abs(row - row1); i++){
+                        if (row > row1 && col > col1 && this.fields[row-i][col-i] != null){
+                            return false;
+                        } else if (row > row1 && col < col1 && this.fields[row-i][col+i] != null){
+                            return false;
+                        } else if (row < row1 && col > col1 && this.fields[row+i][col-i] != null){
+                            return false;
+                        } else if (row < row1 && col < col1 && this.fields[row+i][col+i] != null){
+                            return false;
+                        }
+                    }
+                }
         }
         return true;
+    }
+
+    public boolean move_figure(int row, int col, int row1, int col1){
+      Figure figure = this.fields[row][col];
+      if (figure != null && figure.canMove(row, col, row1, col1) && this.fields[row1][col1] == null && figure.getColor() == this.colorGame && check_move(figure, row, col, row1, col1)){
+          this.fields[row1][col1] = figure;
+          this.fields[row][col] = null;
+          return true;
+      }else  if (figure.canAttack(row, col, row1, col1) && this.fields[row1][col1] != null && this.fields[row1][col1].getColor() != this.fields[row][col].getColor() && check_move(figure, row, col, row1, col1)){
+          this.fields[row1][col1] = figure;
+          this.fields[row][col] = null;
+          return true;
+      }
+        return false;
     }
 }
