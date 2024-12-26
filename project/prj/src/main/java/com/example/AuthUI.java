@@ -11,8 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Text;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class AuthUI {
@@ -68,8 +68,6 @@ public class AuthUI {
 				result.setText("success");
 
 				showTable(con);
-
-				con.close();
 			} catch (Exception err) {
 				firstValue.clear();
 				secondValue.clear();
