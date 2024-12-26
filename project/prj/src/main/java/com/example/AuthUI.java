@@ -6,61 +6,81 @@ import java.sql.DriverManager;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class AuthUI {
     private TextField firstValue;
     private PasswordField secondValue;
-    private TextField result;
+    private Text result;
+    private Stage stage;
+
+    public AuthUI(Stage stage) {
+			this.stage = stage;
+    }
 
     public GridPane createLayout() {
-        GridPane rootNode = new GridPane();
-        rootNode.setPadding(new Insets(15));
-        rootNode.setHgap(5);
-        rootNode.setVgap(5);
-        rootNode.setAlignment(Pos.CENTER);
+			GridPane rootNode = new GridPane();
+			rootNode.setPadding(new Insets(15));
+			rootNode.setHgap(5);
+			rootNode.setVgap(5);
+			rootNode.setAlignment(Pos.CENTER);
 
-        addInputFields(rootNode);
-        addSignInButton(rootNode);
+			addInputFields(rootNode);
+			addSignInButton(rootNode);
 
-        return rootNode;
+			return rootNode;
     }
 
     private void addInputFields(GridPane rootNode) {
-        rootNode.add(new Label("User:"), 0, 0);
-        firstValue = new TextField();
-        rootNode.add(firstValue, 1, 0);
+			rootNode.add(new Label("User:"), 0, 0);
+			firstValue = new TextField();
+			rootNode.add(firstValue, 1, 0);
 
-        rootNode.add(new Label("Password:"), 0, 1);
-        secondValue = new PasswordField();
-        rootNode.add(secondValue, 1, 1);
+			rootNode.add(new Label("Password:"), 0, 1);
+			secondValue = new PasswordField();
+			rootNode.add(secondValue, 1, 1);
 
-        result = new TextField();
-        result.setEditable(false);
-        rootNode.add(result, 1, 3);
+			result = new Text();
+			rootNode.add(result, 1, 2);
     }
 
     private void addSignInButton(GridPane rootNode) {
-        Button aButton = new Button("Sign in");
-        rootNode.add(aButton, 1, 2);
-        GridPane.setHalignment(aButton, HPos.LEFT);
+			Button aButton = new Button("Sign in");
+			rootNode.add(aButton, 1, 3);
+			GridPane.setHalignment(aButton, HPos.LEFT);
 
-        aButton.setOnAction(e -> handleSignIn());
+			aButton.setOnAction(e -> handleSignIn());
     }
 
     private void handleSignIn() {
-        String value1 = firstValue.getText();
-        String value2 = secondValue.getText();
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/world", value1, value2);
-            result.setText("success");
-        } catch (Exception err) {
-            result.setText("Incorrect login or password");
-        }
+			String user = firstValue.getText();
+			String password = secondValue.getText();
+			try {
+				Class.forName("com.mysql.cj.jdbc.Driver");
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/world", user, password);
+				result.setText("success");
+
+				showTable(con);
+
+				con.close();
+			} catch (Exception err) {
+				firstValue.clear();
+				secondValue.clear();
+				result.setText("Incorrect login or password");
+			}
+    }
+
+    private void showTable(Connection con) {
+			TableUI tableUI = new TableUI(con);
+			Scene tableScene = new Scene(tableUI.createLayout(), 400, 400);
+			stage.setScene(tableScene);
+			stage.setTitle("Table");
     }
 }
