@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     @Override
     public void start(Stage stage) {
-        AuthUI authUI = new AuthUI(stage);
+        AuthWindow authUI = new AuthWindow(stage);
         Scene scene = new Scene(authUI.createLayout(), 400, 300);
         stage.setTitle("Authorization");
         stage.setScene(scene);
