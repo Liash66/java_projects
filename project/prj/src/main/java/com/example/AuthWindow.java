@@ -65,8 +65,6 @@ public class AuthWindow {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/world", user, password);
-			result.setText("success");
-
 			showTable(con);
 		} catch (Exception err) {
 			firstValue.clear();

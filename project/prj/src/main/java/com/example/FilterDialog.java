@@ -54,7 +54,7 @@ public class FilterDialog {
 			int maxPop = maxPopulation.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(maxPopulation);
 			tableWindow.filterCountries(minPop, maxPop);
 		} catch (NumberFormatException e) {
-			System.out.println("Invalid input for population. Please enter valid numbers.");
+			System.out.println("Invalid input. Enter valid numbers.");
 		}
 	}
 }
